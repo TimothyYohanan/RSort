@@ -79,8 +79,8 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
     rs_size_max ct[2][nDV];
     rs_size_col buff = 0;
     
-    memset(tmp, 0, 2 * nRows * nDV * sizeof(void*));
-    memset(ct, 0, 2 * nDV * sizeof(rs_size_max));
+    memset(tmp, 0, sizeof(tmp));
+    memset(ct, 0, sizeof(ct));
     
     rs_int stepCt = nSteps - 1;
     void* memPtr = mS + stepCt;
@@ -111,7 +111,7 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
             if (dVct > 0)
             {
-                for (rs_size_max j = 0; j < nRows; ++j)
+                for (rs_size_max j = 0; j < dVct; ++j)
                 {
                     memPtr = tmp[currIdx][i][j];
 
@@ -137,8 +137,8 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
         if (stepCt != 0)
         {
-            memset(tmp[currIdx], 0, nRows * nDV * sizeof(void*));
-            memset(ct[currIdx], 0, nDV * sizeof(rs_size_max));
+            memset(tmp[currIdx], 0, sizeof(tmp[currIdx]));
+            memset(ct[currIdx], 0, sizeof(ct[currIdx]));
         }
 
         if (currIdx == 0)
@@ -179,7 +179,7 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
         if (dVct > 0)
         {
-            for (rs_size_max j = 0; j < nRows; ++j)
+            for (rs_size_max j = 0; j < dVct; ++j)
             {
                 srcPtr = tmp[currIdx][i][j];
 
@@ -212,12 +212,12 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
     void* mS = memStart;
     void* mE = memStart + (nWords * wordSize);
 
-    void*    tmp[2][26][nWords];
-    uint8_t  ct[2][26];
-    char     buff = 0;
+    void*       tmp[2][26][nWords];
+    rs_size_max ct[2][26];
+    char        buff = 0;
     
-    memset(tmp, 0, 2 * nWords * 26 * sizeof(void*));
-    memset(ct, 0, 2 * 26 * sizeof(uint8_t));
+    memset(tmp, 0, sizeof(tmp));
+    memset(ct, 0, sizeof(ct));
     
     int stepCt = wordSize - 1;
     void* memPtr = mS + stepCt;
@@ -236,7 +236,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
     --stepCt;
 
-    uint8_t dVct;
+    rs_size_max dVct;
     uint8_t currIdx = 0;
     uint8_t nextIdx = 1;
 
@@ -248,7 +248,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
             if (dVct > 0)
             {
-                for (rs_size_max j = 0; j < nWords; ++j)
+                for (rs_size_max j = 0; j < dVct; ++j)
                 {
                     memPtr = tmp[currIdx][i][j];
 
@@ -274,8 +274,8 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
         if (stepCt != 0)
         {
-            memset(tmp[currIdx], 0, nWords * 26 * sizeof(void*));
-            memset(ct[currIdx], 0, 26 * sizeof(uint8_t));
+            memset(tmp[currIdx], 0, sizeof(tmp[currIdx]));
+            memset(ct[currIdx], 0, sizeof(ct[currIdx]));
         }
 
         if (currIdx == 0)
@@ -316,7 +316,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
         if (dVct > 0)
         {
-            for (rs_size_max j = 0; j < nWords; ++j)
+            for (rs_size_max j = 0; j < dVct; ++j)
             {
                 srcPtr = tmp[currIdx][i][j];
 
