@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"string.h": "c",
+			"stdbool.h": "c",
+			"singlethreaded.h": "c",
+			"array": "c",
+			"string_view": "c",
+			"initializer_list": "c",
+			"span": "c",
+			"utility": "c",
+			"charconv": "c",
+			"climits": "cpp",
+			"compare": "cpp",
+			"functional": "cpp",
+			"tuple": "cpp",
+			"type_traits": "cpp",
+			"variant": "cpp"
+		}
+	}
+}

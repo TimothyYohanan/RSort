@@ -1,0 +1,10 @@
+{
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "files.associations": {
+        "*.tcc": "c",
+        "cstdlib": "c",
+        "memory": "c",
+        "bitmask.h": "c",
+        "string.h": "c"
+    }
+}
