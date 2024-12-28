@@ -248,7 +248,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
             if (dVct > 0)
             {
-                for (uint8_t j = 0; j < nWords; ++j)
+                for (rs_size_max j = 0; j < nWords; ++j)
                 {
                     memPtr = tmp[currIdx][i][j];
 
@@ -316,7 +316,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
         if (dVct > 0)
         {
-            for (uint8_t j = 0; j < nWords; ++j)
+            for (rs_size_max j = 0; j < nWords; ++j)
             {
                 srcPtr = tmp[currIdx][i][j];
 
@@ -326,8 +326,8 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
                 } else
                 {
 #ifdef RSORT_LOG_DEBUG
-                        char* binary_str = TO_BINARY_STRING(char, buff);
-                        fprintf(stdout, "copying %i bytes from tmp[%i][%i][%i] to input at memory location %p, which will overwrite any data stored there. The range of the input is [%p, %p].\n\n", wordSize, currIdx, i, j, memPtr, tmp2mS, tmp2mE);
+                    char* binary_str = TO_BINARY_STRING(char, buff);
+                    fprintf(stdout, "copying %i bytes from tmp[%i][%i][%i] to input at memory location %p, which will overwrite any data stored there. The range of the input is [%p, %p].\n\n", wordSize, currIdx, i, j, memPtr, tmp2mS, tmp2mE);
 #endif
                     memcpy(memPtr, srcPtr, wordSize);
 
@@ -341,5 +341,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
     return RSORT_DONE;
 }
+
+
 
 
