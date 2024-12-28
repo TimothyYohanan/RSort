@@ -111,7 +111,7 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
             if (dVct > 0)
             {
-                for (rs_size_max j = 0; j < nDV; ++j)
+                for (rs_size_max j = 0; j < nRows; ++j)
                 {
                     memPtr = tmp[currIdx][i][j];
 
@@ -179,7 +179,7 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
         if (dVct > 0)
         {
-            for (rs_size_max j = 0; j < nDV; ++j)
+            for (rs_size_max j = 0; j < nRows; ++j)
             {
                 srcPtr = tmp[currIdx][i][j];
 
@@ -248,7 +248,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
             if (dVct > 0)
             {
-                for (uint8_t j = 0; j < 26; ++j)
+                for (uint8_t j = 0; j < nWords; ++j)
                 {
                     memPtr = tmp[currIdx][i][j];
 
@@ -316,7 +316,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
         if (dVct > 0)
         {
-            for (uint8_t j = 0; j < 26; ++j)
+            for (uint8_t j = 0; j < nWords; ++j)
             {
                 srcPtr = tmp[currIdx][i][j];
 
