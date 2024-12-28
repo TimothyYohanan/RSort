@@ -20,7 +20,9 @@
 			"functional": "cpp",
 			"tuple": "cpp",
 			"type_traits": "cpp",
-			"variant": "cpp"
+			"variant": "cpp",
+			"stdio.h": "c",
+			"stdint.h": "c"
 		}
 	}
 }

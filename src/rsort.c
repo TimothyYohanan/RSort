@@ -14,8 +14,7 @@ void default_tokenizer(void* val, rs_size_col* buff)
 
 void lowercase_character_tokenizer(void* val, rs_size_col* buff) 
 {
-    char _val = *(char*)val;
-    char token = _val - 'a';
+    char token = *(char*)val - 'a';
     memcpy(buff, (void*)(&token), sizeof(rs_size_col));
 }
 
@@ -23,39 +22,39 @@ rs_uint rsort_prechecks(const rs_size_row rowSize, const rs_size_col colSize, rs
 {
     if (rowSize < colSize) 
     {
-        fprintf(stderr, "rsort() - ERROR: rowSize < colSize == true\n");
+        fprintf(stderr, "rsort_prechecks() - ERROR: rowSize < colSize == true\n");
         return RSORT_ERROR;
     }
 
     if (rowSize % colSize != 0) 
     {
-        fprintf(stderr, "rsort() - ERROR: rowSize modulo colSize != 0\n");
-        fprintf(stderr, "rsort() - %i mod %i = %i\n", rowSize, colSize, rowSize % colSize);
+        fprintf(stderr, "rsort_prechecks() - ERROR: rowSize modulo colSize != 0\n");
+        fprintf(stderr, "rsort_prechecks() - %i mod %i = %i\n", rowSize, colSize, rowSize % colSize);
         return RSORT_ERROR;
     }
 
     if (colSize > 4) 
     {
-        fprintf(stderr, "rsort() - ERROR: colSize > 8\n");
+        fprintf(stderr, "rsort_prechecks() - ERROR: colSize > 8\n");
         return RSORT_ERROR;
     }
 
     if (nDV <= 0)
     {
-        fprintf(stderr, "rsort() - ERROR: nDV <= 0.\n");
+        fprintf(stderr, "rsort_prechecks() - ERROR: nDV <= 0.\n");
         return RSORT_ERROR;
     }
 
     if (((rs_size_max)1 << (8 * colSize)) - 1 > RS_SIZE_COL_MAX || ((rs_size_max)1 << (8 * colSize)) - 1 < 0)
     {
-        fprintf(stderr, "rsort() - ERROR: rs_size_col is too small to hold the selected colSize. %i > %i || %i < 0 \n", ((rs_size_max)1 << (8 * colSize)) - 1, RS_SIZE_COL_MAX, ((rs_size_max)1 << (8 * colSize)) - 1);
-        fprintf(stderr, "rsort() - You can change the size of rs_size_col by defining it to be the same as a different datatype in rsort.h\n");
+        fprintf(stderr, "rsort_prechecks() - ERROR: rs_size_col is too small to hold the selected colSize. %i > %i || %i < 0 \n", ((rs_size_max)1 << (8 * colSize)) - 1, RS_SIZE_COL_MAX, ((rs_size_max)1 << (8 * colSize)) - 1);
+        fprintf(stderr, "rsort_prechecks() - You can change the size of rs_size_col by defining it to be the same as a different datatype in rsort.h\n");
         return RSORT_ERROR;
     }
 
     if (tokenizer == NULL)
     {
-        fprintf(stderr, "rsort() - ERROR: tokenizer is null.\n");
+        fprintf(stderr, "rsort_prechecks() - ERROR: tokenizer is null.\n");
         return RSORT_ERROR;
     }
 
@@ -64,7 +63,11 @@ rs_uint rsort_prechecks(const rs_size_row rowSize, const rs_size_col colSize, rs
 
 rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRows, const rs_size_row rowSize, const rs_size_col colSize, rs_size_col nDV, void(*tokenizer)(void*, rs_size_col*))
 {
-    if (memStart == NULL) return RSORT_ERROR;
+    if (memStart == NULL)
+    {
+        fprintf(stderr, "rsort_lsb_unsigned_bytes_v1() - ERROR: memStart == NULL\n");
+        return RSORT_ERROR;
+    }
 
 #ifdef RSORT_PREFLIGHT_CHECKS
     if ((rsort_prechecks(rowSize, colSize, nDV, tokenizer) != RSORT_HEALTHY)) return RSORT_ERROR;
@@ -93,7 +96,7 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
 #ifdef RSORT_LOG_DEBUG
         char* binary_str = TO_BINARY_STRING(rs_size_col, buff);
-        fprintf(stdout, "rsort itteration %i: sorted token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, 0);
+        fprintf(stdout, "rsort_lsb_unsigned_bytes_v1() - DEBUG: column %i: sorted the pointer to token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, 0);
 #endif
     }
 
@@ -117,7 +120,8 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
                     if (memPtr == NULL)
                     {
-                        break;
+                        fprintf(stderr, "rsort_lsb_unsigned_bytes_v1() - ERROR: memPtr == NULL inside range of dVct. This should be impossible.");
+                        return RSORT_ERROR;
                     } else
                     {
                         --memPtr;
@@ -128,7 +132,7 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
 #ifdef RSORT_LOG_DEBUG
                         char* binary_str = TO_BINARY_STRING(rs_size_col, buff);
-                        fprintf(stdout, "rsort itteration %i: sorted token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, nextIdx);
+                        fprintf(stdout, "rsort_lsb_unsigned_bytes_v1() - DEBUG: column %i: sorted the pointer to token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, nextIdx);
 #endif
                     }
                 }
@@ -152,18 +156,6 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
         }
     }
 
-    /*
-    * Note for application-specific usages:
-    * Writing to tmp2 and then copying to memStart is not efficient, but it is safe.
-    * 
-    * Something like this would be faster:
-    *   void* tmp2 = malloc(nRows * rowSize)
-    *   <execute loop, then...>
-    *   free(memStart) // if applicable
-    *   memStart = tmp2
-    * 
-    *   [don't forget to free memStart again before the application closes.]
-    */
     void* tmp2[nRows][rowSize];
     memPtr = tmp2;
     void* srcPtr;
@@ -185,12 +177,13 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
                 if (srcPtr == NULL)
                 {
-                    break;
+                    fprintf(stderr, "rsort_lsb_unsigned_bytes_v1() - ERROR: srcPtr == NULL inside range of dVct. This should be impossible.");
+                    return RSORT_ERROR;
                 } else
                 {
 #ifdef RSORT_LOG_DEBUG
-                        char* binary_str = TO_BINARY_STRING(rs_size_col, buff);
-                        fprintf(stdout, "copying %i bytes from tmp[%i][%i][%i] to input at memory location %p, which will overwrite any data stored there. The range of the input is [%p, %p].\n\n", rowSize, currIdx, i, j, memPtr, tmp2mS, tmp2mE);
+                    char* binary_str = TO_BINARY_STRING(rs_size_col, buff);
+                    fprintf(stdout, "rsort_lsb_unsigned_bytes_v1() - DEBUG: copying %i bytes starting from the pointer stored at tmp[%i][%i][%i] to a new memory region on the stack at address %p. The address range of the new memory region is [%p, %p].\n\n", rowSize, currIdx, i, j, memPtr, tmp2mS, tmp2mE);
 #endif
                     memcpy(memPtr, srcPtr, rowSize);
 
@@ -200,6 +193,9 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
         }
     }
 
+#ifdef RSORT_LOG_DEBUG
+    fprintf(stdout, "rsort_lsb_unsigned_bytes_v1() - DEBUG: copying %i bytes starting from the pointer stored at tmp2 to the memory region passed to the function as 'memStart', which begins at %p. The address range of that region is [%p, %p].\n\n", nRows * rowSize, mS, mS, mE);
+#endif
     memcpy(mS, tmp2, nRows * rowSize);
 
     return RSORT_DONE;
@@ -207,7 +203,11 @@ rs_uint rsort_lsb_unsigned_bytes_v1(const void* memStart, const rs_size_max nRow
 
 rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWords, const uint8_t wordSize)
 {
-    if (memStart == NULL) return RSORT_ERROR;
+    if (memStart == NULL)
+    {
+        fprintf(stderr, "rsort_lsb_lowercase_text_v1() - ERROR: memStart == NULL\n");
+        return RSORT_ERROR;
+    }
 
     void* mS = memStart;
     void* mE = memStart + (nWords * wordSize);
@@ -230,7 +230,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
 #ifdef RSORT_LOG_DEBUG
         char* binary_str = TO_BINARY_STRING(char, buff);
-        fprintf(stdout, "rsort itteration %i: sorted token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, 0);
+        fprintf(stdout, "rsort_lsb_lowercase_text_v1() - DEBUG: column %i: sorted the pointer to token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, 0);
 #endif
     }
 
@@ -254,7 +254,8 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
                     if (memPtr == NULL)
                     {
-                        break;
+                        fprintf(stderr, "rsort_lsb_lowercase_text_v1() - ERROR: memPtr == NULL inside range of dVct. This should be impossible.");
+                        return RSORT_ERROR;
                     } else
                     {
                         --memPtr;
@@ -265,7 +266,7 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
 #ifdef RSORT_LOG_DEBUG
                         char* binary_str = TO_BINARY_STRING(char, buff);
-                        fprintf(stdout, "rsort itteration %i: sorted token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, nextIdx);
+                        fprintf(stdout, "rsort_lsb_lowercase_text_v1() - DEBUG: column %i: sorted the pointer to token '%s' aka '%i' into tmp[%i]\n\n", stepCt + 1, binary_str, buff, nextIdx);
 #endif
                     }
                 }
@@ -289,18 +290,6 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
         }
     }
 
-    /*
-    * Note for application-specific usages:
-    * Writing to tmp2 and then copying to memStart is not efficient, but it is safe.
-    * 
-    * Something like this would be faster:
-    *   void* tmp2 = malloc(nWords * wordSize)
-    *   <execute loop, then...>
-    *   free(memStart) // if applicable
-    *   memStart = tmp2
-    * 
-    *   [don't forget to free memStart again before the application closes.]
-    */
     void* tmp2[nWords][wordSize];
     memPtr = tmp2;
     void* srcPtr;
@@ -322,12 +311,13 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
 
                 if (srcPtr == NULL)
                 {
-                    break;
+                    fprintf(stderr, "rsort_lsb_lowercase_text_v1() - ERROR: srcPtr == NULL inside range of dVct. This should be impossible.");
+                    return RSORT_ERROR;
                 } else
                 {
 #ifdef RSORT_LOG_DEBUG
                     char* binary_str = TO_BINARY_STRING(char, buff);
-                    fprintf(stdout, "copying %i bytes from tmp[%i][%i][%i] to input at memory location %p, which will overwrite any data stored there. The range of the input is [%p, %p].\n\n", wordSize, currIdx, i, j, memPtr, tmp2mS, tmp2mE);
+                    fprintf(stdout, "rsort_lsb_lowercase_text_v1() - DEBUG: copying %i bytes starting from the pointer stored at tmp[%i][%i][%i] to a new memory region on the stack at address %p. The address range of the new memory region is [%p, %p].\n\n", wordSize, currIdx, i, j, memPtr, tmp2mS, tmp2mE);
 #endif
                     memcpy(memPtr, srcPtr, wordSize);
 
@@ -337,11 +327,10 @@ rs_uint rsort_lsb_lowercase_text_v1(const void* memStart, const rs_size_max nWor
         }
     }
 
+#ifdef RSORT_LOG_DEBUG
+    fprintf(stdout, "rsort_lsb_lowercase_text_v1() - DEBUG: copying %i bytes starting from the pointer stored at tmp2 to the memory region passed to the function as 'memStart', which begins at %p. The address range of that region is [%p, %p].\n\n", nWords * wordSize, mS, mS, mE);
+#endif
     memcpy(mS, tmp2, nWords * wordSize);
 
     return RSORT_DONE;
 }
-
-
-
-
